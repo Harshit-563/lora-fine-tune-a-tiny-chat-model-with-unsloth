@@ -56,8 +56,24 @@ def get_lora_target_modules():
     # in the canonical q, k, v, o order as specified for Qwen2.5
     return ["q_proj", "k_proj", "v_proj", "o_proj"]
 
-# Step 6 - attach_lora_adapters (not yet solved)
-# TODO: implement
+# Step 6 - attach_lora_adapters
+def attach_lora_adapters(model, r=8, lora_alpha=16, target_modules=None):
+    """Wrap the base model with LoRA adapters and return the PEFT model."""
+    # Default to the attention projections returned by get_lora_target_modules
+    if target_modules is None:
+        target_modules = get_lora_target_modules()
+    
+    # Wrap the base model with LoRA adapters using Unsloth's FastLanguageModel
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=r,
+        lora_alpha=lora_alpha,
+        target_modules=target_modules,
+        lora_dropout=0,
+        bias="none",
+    )
+    
+    return model
 
 # Step 7 - count_trainable_parameters (not yet solved)
 # TODO: implement
